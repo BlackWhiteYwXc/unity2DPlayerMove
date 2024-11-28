@@ -6,10 +6,10 @@ using UnityEngine.Serialization;
 
 public class PlayerMove : MonoBehaviour
 {
-    public float deMoveForce = 10f;//默认移动速度
-    public float deJumpForce = 15f;//默认跳跃速度
-    public float deFallForce = 5f;
-    public LayerMask Ground;//地面layer
+    [SerializeField]private float deMoveForce = 10f;//默认移动速度
+    [SerializeField]private float deJumpForce = 15f;//默认跳跃速度
+    [SerializeField]private float deFallForce = 5f;
+    [SerializeField]private LayerMask Ground;//地面layer
     private bool isGrounded;//用于判断是否在地面上
     private float moveProportionX;//水平方向的速度比例
     private Animator playerAnimator;//对象上状态机
@@ -37,34 +37,46 @@ public class PlayerMove : MonoBehaviour
     }
     //跳跃
     private float coyoteTimeCounter;//土狼时间计数器
-    public float coyoteTime = 0.2f;//土狼时间
+    [SerializeField]private float coyoteTime = 0.2f;//土狼时间
     private float riseTimeCounter;//上升时间计数器
-    public float riseTime = 0.15f;//到达最大高度的时间
+    [SerializeField]private float riseTime = 0.15f;//到达最大高度的时间
+    private float jumpBufferCounter;//跳跃缓冲计时
+    [SerializeField]private float jumpBufferTime = 0.15f;//跳跃缓冲
+    
     private void JumpPlayer()
     {
         //判断是否再地面上
         isGrounded = Physics2D.OverlapCircle(transform.position, 0.2f, Ground);
+        //线性跳跃
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             isJumping = true;
         }
-
         if (Input.GetButtonUp("Jump"))
         {
             isJumping = false;
         }
-
         if (!isJumping)
         {
             rigidbody2D.velocity -= new Vector2(0f, -Physics2D.gravity.y * Time.deltaTime * deFallForce);
             playerAnimator.SetBool("isFall", true);
         }
+        //跳跃缓冲
+        if (Input.GetButtonDown("Jump"))
+        {
+            jumpBufferCounter = jumpBufferTime;
+        }
+        else
+        {
+            jumpBufferCounter -= Time.deltaTime;
+        }
         //输入jump执行跳跃//土狼时间
         coyoteTimeCounter += Time.deltaTime;
-        if (Input.GetButtonDown("Jump") && (isGrounded || coyoteTimeCounter <= coyoteTime))
+        if ( Input.GetButton("Jump") && (isGrounded || coyoteTimeCounter <= coyoteTime || jumpBufferCounter > 0f))
         {
             rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, deJumpForce);
             playerAnimator.SetTrigger("Jump");
+            jumpBufferCounter = 0f;
         }
         
         //改变重力的时刻

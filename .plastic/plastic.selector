@@ -1,0 +1,4 @@
+repository "2DPlayerMove@wechat_os_qy0-bgvgtjw6rryczgnil8yam@cloud.cn"
+  path "/"
+    br "/main"
+    co "/main"

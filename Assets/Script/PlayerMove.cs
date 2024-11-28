@@ -34,21 +34,25 @@ public class PlayerMove : MonoBehaviour
         playerAnimator.SetBool("isMove",Mathf.Abs(moveProportionX) > 0);//根据是否移动来更改状态机待机或者奔跑
     }
     //跳跃
-    private float time;//用于计数器
-    public float downTime = 0.15f;//改变重力的时间
+    private float coyoteTimeCounter;//土狼时间计数器
+    public float coyoteTime = 0.1f;//土狼时间
+    private float riseTimeCounter;//上升时间计数器
+    public float riseTime = 0.15f;//到达最大高度的时间
     private void JumpPlayer()
     {
         //判断是否再地面上
         isGrounded = Physics2D.OverlapCircle(transform.position, 0.2f, Ground);
         //输入jump执行跳跃
-        if (Input.GetButtonDown("Jump") && (isGrounded || time <= 0.05f))
+        coyoteTimeCounter += Time.deltaTime;
+        if (Input.GetButtonDown("Jump") && (isGrounded || coyoteTimeCounter >= coyoteTime))
         {
             rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, deJumpForce);
             playerAnimator.SetTrigger("Jump");
         }
         
         //改变重力的时刻
-        if (time >= downTime)
+        riseTimeCounter += Time.deltaTime;
+        if (riseTimeCounter >= riseTime)
         {
             rigidbody2D.gravityScale = 5;
             playerAnimator.SetBool("isFall", true);
@@ -57,11 +61,10 @@ public class PlayerMove : MonoBehaviour
         //在地面时的处理
         if (isGrounded)
         {
-            time = 0;
+            coyoteTimeCounter = 0;
+            riseTimeCounter = 0; 
             playerAnimator.SetBool("isFall", false);
             rigidbody2D.gravityScale = 1;
         }
-        //计时器
-        time += Time.deltaTime;
     }
 }

@@ -6,8 +6,10 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     private Transform PlayerTransform;
-    private Vector3 velocity = Vector3.zero;//移动速度
-    public Vector3 positionOffset = new Vector3(-5,0,0);//摄像机偏移距离
+    //移动速度
+    private Vector3 velocity = Vector3.zero;
+    //摄像机偏移距离
+    public Vector3 positionOffset = new Vector3(-5,0,0);
     [Range(0,1)]
     public float smoothTime = 0.1f;
     [Header("摄像机限制范围(最小值，最大值)")]

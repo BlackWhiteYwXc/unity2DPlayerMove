@@ -559,6 +559,7 @@ GameObject:
   - component: {fileID: 550670194}
   - component: {fileID: 550670193}
   - component: {fileID: 550670198}
+  - component: {fileID: 550670199}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -646,8 +647,9 @@ MonoBehaviour:
   Ground:
     serializedVersion: 2
     m_Bits: 128
-  coyoteTime: 0.1
+  coyoteTime: 0.2
   riseTime: 0.15
+  jumpBufferTime: 0.15
   maxSpeed: 20
 --- !u!212 &550670196
 SpriteRenderer:
@@ -738,6 +740,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &550670199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550670192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43d255ec392f4de0852a2ae221b35df6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &657488175
 GameObject:
   m_ObjectHideFlags: 0
@@ -6437,6 +6451,6 @@ Tilemap:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 519420032}
   - {fileID: 550670197}
+  - {fileID: 519420032}
   - {fileID: 1046808984}

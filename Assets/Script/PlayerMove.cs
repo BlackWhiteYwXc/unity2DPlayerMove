@@ -6,46 +6,81 @@ using UnityEngine.Serialization;
 
 public class PlayerMove : MonoBehaviour
 {
-    [SerializeField]private float moveForce = 10f;//默认移动速度
-    [SerializeField]private float jumpForce = 15f;//默认跳跃速度
-    [SerializeField]private float fallForce = 5f;
-    [SerializeField]private LayerMask Ground;//地面layer
-    private bool isGrounded;//用于判断是否在地面上
-    private float moveProportionX;//水平方向的速度比例
-    private Animator playerAnimator;//对象上状态机
-    private Rigidbody2D rigidbody2D;//对象上的刚体
-    private SpriteRenderer spriteRenderer;//对象上的精灵渲染器
+    //初始化默认移动速度
+    [SerializeField]private float moveSpeed = 10f;
+    
+    //初始化默认跳跃速度
+    [SerializeField]private float jumpSpeed = 15f;
+    
+    //初始化默认下落速度
+    [SerializeField]private float fallSpeed = 5f;
+    
+    //地面layer
+    [SerializeField]private LayerMask Ground;
+    
+    //用于判断是否在地面上
+    private bool isGrounded;
+    
+    //水平方向的速度比例
+    private float moveProportionX;
+    
+    //对象上的刚体
+    private new Rigidbody2D rigidbody2D;
+    
+    //对象上的精灵渲染器
+    private SpriteRenderer spriteRenderer;
+    
+    //用于判断是否跳起
     private bool isJumping = false;
+    
     void Awake()
     {
      spriteRenderer = GetComponent<SpriteRenderer>();
-     playerAnimator = GetComponent<Animator>();
      rigidbody2D = GetComponent<Rigidbody2D>();
      Ground = LayerMask.GetMask("Ground");
     }
+    
     void Update()
     {
         MovePlayer();
-        JumpPlayer();
+        PlayerJump();
         SpeedLimit();
     }
-    //移动
+    
+    /// <summary>
+    /// 移动
+    /// </summary>
     private void MovePlayer()
     {
         moveProportionX = Input.GetAxis("Horizontal");
-        rigidbody2D.velocity = new Vector2(moveForce * moveProportionX,rigidbody2D.velocity.y);//设置速度
-        spriteRenderer.flipX = !(moveProportionX >= 0);//判断是否需要反转
-        playerAnimator.SetBool("isMove",Mathf.Abs(moveProportionX) > 0);//根据是否移动来更改状态机待机或者奔跑
+        //设置速度
+        rigidbody2D.velocity = new Vector2(moveSpeed * moveProportionX,rigidbody2D.velocity.y);
+        //判断是否需要反转
+        spriteRenderer.flipX = !(moveProportionX >= 0);
     }
-    //跳跃
-    private float coyoteTimeCounter;//土狼时间计数器
-    [SerializeField]private float coyoteTime = 0.2f;//土狼时间
-    private float riseTimeCounter;//上升时间计数器
-    [SerializeField]private float riseTime = 0.15f;//到达最大高度的时间
-    private float jumpBufferCounter;//跳跃缓冲计时
-    private float jumpBufferTime = 0.15f;//跳跃缓冲
     
-    private void JumpPlayer()
+    //土狼时间计数器
+    private float coyoteTimeCounter;
+    
+    //土狼时间
+    [SerializeField]private float coyoteTime = 0.2f;
+    
+    //上升时间计数器
+    private float riseTimeCounter;
+    
+    //到达最大高度的时间
+    [SerializeField]private float riseTime = 0.15f;
+    
+    //跳跃缓冲计时
+    private float jumpBufferCounter;
+    
+    //跳跃缓冲
+    [SerializeField]private float jumpBufferTime = 0.15f;
+    
+    /// <summary>
+    /// 跳跃
+    /// </summary>
+    private void PlayerJump()
     {
         //判断是否再地面上
         isGrounded = Physics2D.OverlapCircle(transform.position, 0.2f, Ground);
@@ -60,8 +95,8 @@ public class PlayerMove : MonoBehaviour
         }
         if (!isJumping)
         {
-            rigidbody2D.velocity -= new Vector2(0f, -Physics2D.gravity.y * Time.deltaTime * fallForce);
-            playerAnimator.SetBool("isFall", true);
+            //增加向下的力
+            rigidbody2D.velocity -= new Vector2(0f, -Physics2D.gravity.y * Time.deltaTime * fallSpeed);
         }
         //跳跃缓冲
         if (Input.GetButtonDown("Jump"))
@@ -76,8 +111,9 @@ public class PlayerMove : MonoBehaviour
         coyoteTimeCounter += Time.deltaTime;
         if ( Input.GetButton("Jump") && (isGrounded || coyoteTimeCounter <= coyoteTime) && jumpBufferCounter > 0f)
         {
-            rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, jumpForce);
-            playerAnimator.SetTrigger("Jump");
+            //执行跳越
+            rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, jumpSpeed);
+            //清空跳越缓冲
             jumpBufferCounter = 0f;
         }
         
@@ -85,21 +121,27 @@ public class PlayerMove : MonoBehaviour
         riseTimeCounter += Time.deltaTime;
         if (riseTimeCounter >= riseTime)
         {
-            rigidbody2D.gravityScale = 5;
-            playerAnimator.SetBool("isFall", true);
+            rigidbody2D.gravityScale = fallSpeed;
         }
             
         //在地面时的处理
         if (isGrounded)
         {
+            //清空土狼时间计数器
             coyoteTimeCounter = 0;
+            //清空上升时间计数器
             riseTimeCounter = 0;
-            playerAnimator.SetBool("isFall", false);
+            //清空重力倍数
             rigidbody2D.gravityScale = 1;
         }
     }
-    //速度限制
+    
+    //最大速度
     [SerializeField]private float maxSpeed = 20f;
+    
+    /// <summary>
+    /// 速度限制
+    /// </summary>
     private void SpeedLimit()
     {
         if (rigidbody2D.velocity.y <= -maxSpeed)

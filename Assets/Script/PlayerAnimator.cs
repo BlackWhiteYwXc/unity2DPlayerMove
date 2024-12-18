@@ -28,13 +28,13 @@ public class PlayerAnimator : MonoBehaviour
     //判断是否在移动
     private void isMove()
     {
-        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) == 0)
+        if(playerRigidbody2D.velocity.x != 0)
         {
-            playerAnimator.SetBool("isMove",false);
+            playerAnimator.SetBool("isMove", false);
         }
-        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) > 0)
+        else
         {
-            playerAnimator.SetBool("isMove",true);
+            playerAnimator.SetBool("isMove", true);
         }
     }
     //判断是否在下落
